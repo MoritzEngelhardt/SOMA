@@ -1,0 +1,123 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f0f0f0;
+}
+
+/* Smartphone Frame */
+.smartphone {
+  position: relative;
+  width: 320px;
+  height: 600px;
+  background: black;
+  border-radius: 40px;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+/* Speaker Slot */
+.smartphone::before {
+  content: "";
+  position: absolute;
+  width: 60px;
+  height: 6px;
+  background: #333;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+}
+
+/* Screen Container */
+.screen-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  background: black;
+  border-radius: 30px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer/Edge */
+}
+
+.screen-container::-webkit-scrollbar {
+  display: none;
+}
+
+.screen {
+  scroll-snap-align: start;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-box {
+  background-color: black;
+}
+
+video {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.rating-box {
+  height: 100%;
+  background-color: black;
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rating-text {
+  color: white;
+  font-size: 20px;
+  margin-bottom: 15px;
+  text-align: center;
+  width: 100%;
+}
+
+.stars {
+  display: flex;
+  gap: 5px;
+}
+
+.star {
+  font-size: 30px;
+  color: gray;
+  cursor: pointer;
+}
+
+.star.selected {
+  color: gold;
+}
+
+.next-btn, .download-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+}
+
+.next-btn:hover, .download-btn:hover {
+  background-color: #0056b3;
+}
