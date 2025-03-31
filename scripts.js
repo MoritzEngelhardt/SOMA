@@ -16,7 +16,7 @@ const videos = [
   shuffleArray(videos);
   
   const container = document.getElementById('videoContainer');
-  
+
   // Insert videos and rating screens
   videos.forEach(video => {
     // Video Section
@@ -150,6 +150,7 @@ const videos = [
     link.download = `ratings_${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
     URL.revokeObjectURL(url);
+    console.log("CSV file is being downloaded...");
   }
   
   document.addEventListener("click", (event) => {

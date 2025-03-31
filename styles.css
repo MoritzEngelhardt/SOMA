@@ -25,7 +25,6 @@ html, body {
   align-items: center;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  
 }
 
 /* Speaker Slot */
@@ -51,7 +50,6 @@ html, body {
   border-radius: 30px;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer/Edge */
-
 }
 
 .screen-container::-webkit-scrollbar {
@@ -65,11 +63,48 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 50px; /* Push content below the title bar */
+}
+
+/* Intro Screen Styles */
+.intro-box {
+  background-color: #000000;
+  height: 100%; /* Ensure intro screen fits smartphone height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+}
+
+.intro-text h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: white;
 
 }
 
-.video-box {
+.intro-text p {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: white;
+
+}
+
+.next-btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.next-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Other screens like video and rating box styles */
+.video-box, .rating-box {
   background-color: black;
 }
 
@@ -142,4 +177,12 @@ video {
   z-index: 10;
   border-top-left-radius: 30px;
   border-top-right-radius: 30px;
+}
+
+.screen {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
