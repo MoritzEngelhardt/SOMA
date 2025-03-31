@@ -25,6 +25,7 @@ html, body {
   align-items: center;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  
 }
 
 /* Speaker Slot */
@@ -50,6 +51,7 @@ html, body {
   border-radius: 30px;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer/Edge */
+
 }
 
 .screen-container::-webkit-scrollbar {
@@ -63,6 +65,8 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-top: 50px; /* Push content below the title bar */
+
 }
 
 .video-box {
@@ -120,4 +124,22 @@ video {
 
 .next-btn:hover, .download-btn:hover {
   background-color: #0056b3;
+}
+
+/* Title Bar */
+.title-bar {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 50px;
+  background: rgba(0, 0, 0, 1);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 10;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
 }
