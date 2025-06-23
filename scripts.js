@@ -16,7 +16,7 @@ function shuffleArray(array) {
 shuffleArray(videos);
 
 const container = document.getElementById('videoContainer');
-const videoViewingDurations = {}; // New object to store video viewing durations
+const videoViewingDurations = {}; // Object to store video viewing durations
 
 // Insert videos and rating screens
 videos.forEach(video => {
@@ -26,7 +26,7 @@ videos.forEach(video => {
     // Video Section
     const videoBox = document.createElement("div");
     videoBox.classList.add("screen", "video-box");
-    // === FIX: Add data-video-id to videoBox directly ===
+    // Add data-video-id to videoBox directly
     videoBox.setAttribute("data-video-id", video.id);
     videoBox.innerHTML = `
       <video loop playsinline>
@@ -113,24 +113,107 @@ let currentIndex = 0;
 const screens = document.querySelectorAll(".screen");
 const ratings = {};
 
+// --- Dragging functionality variables ---
+let isDragging = false;
+let startY;
+let scrollTop;
+let scrollTimeout; // For debouncing scroll end
+
+// --- Implement drag to scroll ---
+container.addEventListener('mousedown', (e) => {
+    // Only respond to left mouse button (button 0)
+    if (e.button === 0) {
+        isDragging = true;
+        startY = e.clientY;
+        scrollTop = container.scrollTop;
+        container.style.cursor = 'grabbing';
+        container.style.userSelect = 'none'; // Prevent text selection
+        if (scrollTimeout) clearTimeout(scrollTimeout); // Clear any pending snap
+    }
+});
+
+container.addEventListener('mouseleave', () => {
+    if (isDragging) {
+        isDragging = false;
+        container.style.cursor = 'grab';
+        container.style.removeProperty('user-select');
+        snapToNearestScreen(); // Snap when mouse leaves while dragging
+    }
+});
+
+container.addEventListener('mouseup', () => {
+    if (isDragging) { // Only snap if a drag actually happened
+        isDragging = false;
+        container.style.cursor = 'grab';
+        container.style.removeProperty('user-select');
+        snapToNearestScreen(); // Snap when mouse button is released
+    }
+});
+
+container.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault(); // Prevent default browser scrolling/selection
+    const walk = (e.clientY - startY); // How far mouse has moved
+    container.scrollTop = scrollTop - walk; // Adjust scroll position
+});
+
+// --- Function to snap to the nearest screen ---
+function snapToNearestScreen() {
+    if (screens.length === 0) return; // Guard against no screens
+
+    const currentScrollTop = container.scrollTop;
+
+    let closestIndex = 0;
+    let minDiff = Infinity; // difference from a perfectly aligned screen top
+
+    screens.forEach((screen, index) => {
+        const screenOffsetTop = screen.offsetTop;
+        // Calculate the absolute difference between current scroll position and screen's ideal top
+        const diff = Math.abs(currentScrollTop - screenOffsetTop);
+
+        if (diff < minDiff) {
+            minDiff = diff;
+            closestIndex = index;
+        }
+    });
+
+    // Check if we are already very close to the target screen's top.
+    // This prevents unnecessary re-snaps if the user has already scrolled almost perfectly.
+    const currentScreenTop = screens[closestIndex].offsetTop;
+    // Only scroll if the target index is different from current, or if not perfectly aligned (tolerance of 2px)
+    if (closestIndex !== currentIndex || Math.abs(currentScrollTop - currentScreenTop) > 2) {
+        currentIndex = closestIndex; // Update the global current index
+        screens[currentIndex].scrollIntoView({ behavior: 'smooth' });
+    }
+    // If already snapped or very close, do nothing.
+}
+
+
 // Function to handle the transition between screens and log final duration for the current video
 container.addEventListener('scroll', () => {
+    // Debounce the scroll event to trigger snapToNearestScreen only when scrolling stops
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+        // Only snap if not currently dragging (to avoid fighting the drag)
+        if (!isDragging) {
+            snapToNearestScreen();
+        }
+    }, 100); // Debounce time set to 100ms for responsiveness and stability
+
+
     const videoElements = document.querySelectorAll('.video-box video');
     videoElements.forEach(videoElement => {
-        // === FIX: Get videoId directly from videoBox ===
         const videoId = videoElement.closest('.video-box').getAttribute('data-video-id');
 
-        // Only process if it's a valid videoId and it's in our tracking object
         if (videoId && videoViewingDurations[videoId]) {
             const rect = videoElement.getBoundingClientRect();
-            // Check if the video is *mostly* out of the visible screen
-            const isMostlyOutOfView = (rect.top >= window.innerHeight || rect.bottom <= 0);
+            // Using container.clientHeight instead of window.innerHeight for accuracy within the mockup
+            const isMostlyOutOfView = (rect.top >= container.clientHeight || rect.bottom <= 0);
 
             if (isMostlyOutOfView && videoViewingDurations[videoId].lastStartTime) {
-                // Video is out of view due to scroll, log duration
                 const duration = Date.now() - videoViewingDurations[videoId].lastStartTime;
                 videoViewingDurations[videoId].totalDuration += duration;
-                videoViewingDurations[videoId].lastStartTime = null; // Reset
+                videoViewingDurations[videoId].lastStartTime = null;
             }
         }
     });
@@ -139,17 +222,15 @@ container.addEventListener('scroll', () => {
 
 function scrollToNext() {
     if (currentIndex < screens.length - 1) {
-        // Before scrolling to the next, check if the current screen is a video and record its duration
         const currentScreen = screens[currentIndex];
         if (currentScreen.classList.contains('video-box')) {
             const videoElement = currentScreen.querySelector('video');
-            // === FIX: Get videoId directly from videoBox ===
             const videoId = videoElement.closest('.video-box').getAttribute('data-video-id');
 
             if (videoId && videoViewingDurations[videoId] && videoViewingDurations[videoId].lastStartTime) {
                 const duration = Date.now() - videoViewingDurations[videoId].lastStartTime;
                 videoViewingDurations[videoId].totalDuration += duration;
-                videoViewingDurations[videoId].lastStartTime = null; // Reset
+                videoViewingDurations[videoId].lastStartTime = null;
             }
         }
         currentIndex++;
@@ -159,17 +240,15 @@ function scrollToNext() {
 
 function scrollToPrevious() {
     if (currentIndex > 0) {
-        // Before scrolling to the previous, check if the current screen is a video and record its duration
         const currentScreen = screens[currentIndex];
         if (currentScreen.classList.contains('video-box')) {
             const videoElement = currentScreen.querySelector('video');
-            // === FIX: Get videoId directly from videoBox ===
             const videoId = videoElement.closest('.video-box').getAttribute('data-video-id');
 
             if (videoId && videoViewingDurations[videoId] && videoViewingDurations[videoId].lastStartTime) {
                 const duration = Date.now() - videoViewingDurations[videoId].lastStartTime;
                 videoViewingDurations[videoId].totalDuration += duration;
-                videoViewingDurations[videoId].lastStartTime = null; // Reset
+                videoViewingDurations[videoId].lastStartTime = null;
             }
         }
         currentIndex--;
@@ -184,21 +263,18 @@ document.addEventListener("click", (event) => {
         const starContainer = event.target.parentElement;
         const ratingValue = event.target.getAttribute("data-value");
         const ratingBox = starContainer.closest(".rating-box");
-        // Ensure ratingBox is found before trying to get attribute
         const videoId = ratingBox ? ratingBox.getAttribute("data-video-id") : null;
-        const questionType = starContainer.getAttribute("data-question"); // Get "videoRating" or "purchaseLikelihood"
+        const questionType = starContainer.getAttribute("data-question");
 
-        if (videoId) { // Only proceed if videoId is valid
+        if (videoId) {
             starContainer.querySelectorAll(".star").forEach(star => {
                 star.classList.toggle("selected", parseInt(star.getAttribute("data-value")) <= parseInt(ratingValue));
             });
 
-            // Ensure we store both ratings separately
             if (!ratings[videoId]) {
                 ratings[videoId] = { videoRating: null, purchaseLikelihood: null };
             }
 
-            // Assign the correct value based on question type
             ratings[videoId][questionType] = parseInt(ratingValue);
         }
     }
@@ -242,7 +318,6 @@ document.addEventListener("click", (event) => {
 window.addEventListener('beforeunload', () => {
     const videoElements = document.querySelectorAll('.video-box video');
     videoElements.forEach(videoElement => {
-        // === FIX: Get videoId directly from videoBox ===
         const videoId = videoElement.closest('.video-box').getAttribute('data-video-id');
         if (videoId && videoViewingDurations[videoId] && videoViewingDurations[videoId].lastStartTime) {
             const duration = Date.now() - videoViewingDurations[videoId].lastStartTime;

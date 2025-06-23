@@ -51,7 +51,7 @@ html, body {
   flex-grow: 1; /* Takes all available space after title-bar */
   width: 100%; /* Takes full width of parent's content area */
   overflow-y: scroll;
-  scroll-snap-type: y mandatory;
+  /*scroll-snap-type: y mandatory;
   background: black;
   border-radius: 30px; /* Match smartphone's inner radius */
   scrollbar-width: none; /* Firefox */
@@ -88,8 +88,9 @@ html, body {
 
 .intro-text h1 {
   font-size: 2rem;
-  margin-bottom: 1rem;
   color: white;
+    margin-bottom: 1rem;
+  padding: 1rem;
 
 }
 
@@ -97,6 +98,7 @@ html, body {
   font-size: 1.2rem;
   margin-bottom: 1rem;
   color: white;
+  padding: 1rem;
 
 }
 
